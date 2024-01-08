@@ -15,7 +15,7 @@ const isUserLoggedIn = async (req, res, next) => {
     if (!token) return res.status(401).json({ message: 'Authentication failed. Please login again!' })
 
     const isDecoded = jwt.decode(token, process.env.JWT_SECRET)
-    if (!isDecoded) return res.status(401).message({ message: 'Authentication failed. Please login again!' })
+    if (!isDecoded) return res.status(401).json({ message: 'Authentication failed. Please login again!' })
     
     const user = await UserModel.findById(isDecoded?.userId).lean()
     if (!user) return res.status(401).json({ message: 'Authentication failed. Please login again!' })
