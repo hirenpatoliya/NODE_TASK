@@ -21,13 +21,13 @@ const get = async(req,res) => {
         // searching, sorting, filtering on user's projects
         const { start, limit, sorting, search, filter } = getPaginationValues(req.query)
 
-        let query = search ? { title: { $regex: new RegExp('^.*' + search + '.*', 'i') } } : { }
+        const query = search ? { title: { $regex: new RegExp('^.*' + search + '.*', 'i') } } : { }
 
-        query = filter ? { status: {$in: [filter] } } : {}
+        const filters = filter ? { status: {$in: [filter] } } : {}
         // here i calculate total count because for give count of filtered document dynamically based on that pagination is working
         const [project,totalCount] = await Promise.all([
-            ProjectModel.find({ createdBy: req.user._id, ...query }).sort(sorting).skip(Number(start)).limit(Number(limit)).lean(),
-            ProjectModel.countDocuments({ createdBy: req.user._id, ...query })
+            ProjectModel.find({ createdBy: req.user._id, ...query, ...filters }).sort(sorting).skip(Number(start)).limit(Number(limit)).lean(),
+            ProjectModel.countDocuments({ createdBy: req.user._id, ...query, ...filters })
         ])
         if(!project) return res.status(404).json({message: 'Prject Not Found'})
 
